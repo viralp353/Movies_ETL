@@ -174,8 +174,21 @@ def automated_ETL(wiki_movies_raw,kaggle_metadata,ratings):
     except (Exception) as error:
         print("Budget isn't clean",error)
     
+    #Clean Release Date:
+    try:
+        release_date = wiki_movies_df['Release date'].dropna().apply(lambda x: ' '.join(x) if type(x) == list else x)
+        date_form_one = r'(?:January|February|March|April|May|June|July|August|September|October|November|December)\s[123]\d,\s\d{4}'
+        date_form_two = r'\d{4}.[01]\d.[123]\d'
+        date_form_three = r'(?:January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4}'
+        date_form_four = r'\d{4}'
+        release_date.str.extract(f'({date_form_one}|{date_form_two}|{date_form_three}|{date_form_four})', flags=re.IGNORECASE)
+        wiki_movies_df['release_date'] = pd.to_datetime(release_date.str.extract(f'({date_form_one}|{date_form_two}|{date_form_three}|{date_form_four})')[0], infer_datetime_format=True)
+    except (Exception) as error:
+        print("Release date isn't found",error)
+    
 
     
+
 
 
 # %%
