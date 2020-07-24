@@ -199,7 +199,19 @@ def automated_ETL(wiki_movies_raw,kaggle_metadata,ratings):
 
     except (Exception) as error:
         print("Running time isn't found",error)
-        
+
+    # Clean the Kaggle Data:
+    try:
+        kaggle_metadata = kaggle_metadata[kaggle_metadata['adult'] == 'False'].drop('adult',axis='columns')
+        kaggle_metadata['video'] = kaggle_metadata['video'] == 'True'
+        kaggle_metadata['budget'] = kaggle_metadata['budget'].astype(int)
+        kaggle_metadata['id'] = pd.to_numeric(kaggle_metadata['id'], errors='raise')
+        kaggle_metadata['popularity'] = pd.to_numeric(kaggle_metadata['popularity'], errors='raise')
+        kaggle_metadata['release_date'] = pd.to_datetime(kaggle_metadata['release_date'])
+    except (Exception) as error:
+        print("data isn't clean",error)
+
+
 
 
 
