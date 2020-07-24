@@ -187,7 +187,20 @@ def automated_ETL(wiki_movies_raw,kaggle_metadata,ratings):
         print("Release date isn't found",error)
     
 
-    
+    # Clean Running time:
+    try:
+        running_time = wiki_movies_df['Running time'].dropna().apply(lambda x: ' '.join(x) if type(x) == list else x)
+        running_time[running_time.str.contains(r'^\d*\s*minutes$', flags=re.IGNORECASE) != True]
+        running_time[running_time.str.contains(r'^\d*\s*m', flags=re.IGNORECASE) != True]
+        running_time_extract = running_time.str.extract(r'(\d+)\s*ho?u?r?s?\s*(\d*)|(\d+)\s*m')
+        running_time_extract = running_time_extract.apply(lambda col: pd.to_numeric(col, errors='coerce')).fillna(0)
+        wiki_movies_df['running_time'] = running_time_extract.apply(lambda row: row[0]*60 + row[1] if row[2] == 0 else row[2], axis=1)
+        wiki_movies_df.drop('Running time', axis=1, inplace=True)
+
+    except (Exception) as error:
+        print("Running time isn't found",error)
+        
+
 
 
 
