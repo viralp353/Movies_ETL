@@ -211,6 +211,14 @@ def automated_ETL(wiki_movies_raw,kaggle_metadata,ratings):
     except (Exception) as error:
         print("data isn't clean",error)
 
+    # Clean rating data:
+    try:
+        ratings['timestamp'] = pd.to_datetime(ratings['timestamp'], unit='s')
+    except (Exception) as error:
+        print("rating data isn't clean",error)
+
+    
+
 
 
 
