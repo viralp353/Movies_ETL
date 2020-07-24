@@ -89,7 +89,26 @@ def automated_ETL(wiki_movies_raw,kaggle_metadata,ratings):
     except (Exception) as error:
         print("Columns isn't keep",error)
 
-    #
+    #clean box office data:
+    try:
+        box_office = wiki_movies_df['Box office'].dropna()
+        box_office[box_office.map(is_not_a_string)]
+        box_office[box_office.map(lambda x: type(x) != str)]
+        box_office = box_office.apply(lambda x: ' '.join(x) if type(x) == list else x)
+        form_one = r'\$\d+\.?\d*\s*[mb]illion'
+        form_two = r'\$\d{1,3}(?:,\d{3})+'
+        matches_form_one = box_office.str.contains(form_one, flags=re.IGNORECASE)
+        matches_form_two = box_office.str.contains(form_two, flags=re.IGNORECASE)
+        box_office[~matches_form_one & ~matches_form_two]
+    except (Exception) as error:
+        print("match not found",error)
+
+    #fix patten:
+    form_one = r'\$\s*\d+\.?\d*\s*[mb]illi?on'
+    form_two = r'\$\s*\d{1,3}(?:[,\.]\d{3})+(?!\s[mb]illion)'
+
+    # Parse the Box Office Data
+
     def parse_dollars(s):
     # if s is not a string, return NaN
         if type(s) != str:
@@ -134,6 +153,27 @@ def automated_ETL(wiki_movies_raw,kaggle_metadata,ratings):
         # otherwise, return NaN
         else:
             return np.nan
+
+    try:
+        wiki_movies_df['box_office'] = box_office.str.extract(f'({form_one}|{form_two})', flags=re.IGNORECASE)[0].apply(parse_dollars)
+
+    except (Exception) as error:
+        print("formule isn't work",error)
+
+    # Clean budget:
+    try:
+        budget = wiki_movies_df['Budget'].dropna()
+        budget = budget.map(lambda x: ' '.join(x) if type(x) == list else x)
+        budget = budget.str.replace(r'\$.*[-—–](?![a-z])', '$', regex=True)
+        matches_form_one = budget.str.contains(form_one, flags=re.IGNORECASE)
+        budget = budget.str.replace(r'\[\d+\]\s*', '')
+        budget[~matches_form_one & ~matches_form_two]
+        wiki_movies_df['budget'] = budget.str.extract(f'({form_one}|{form_two})', flags=re.IGNORECASE)[0].apply(parse_dollars)
+        wiki_movies_df.drop('Budget', axis=1, inplace=True)
+
+    except (Exception) as error:
+        print("Budget isn't clean",error)
+    
 
     
 
