@@ -87,7 +87,7 @@ def automated_ETL(wiki_movies_raw,kaggle_metadata,ratings):
         clean_movies = [clean_movie(movie) for movie in wiki_movies]
         wiki_movies_df = pd.DataFrame(clean_movies)
     except (Exception) as error:
-        print("movies isn;t find",error)
+        print("movies isn't find",error)
     
     #Remove Duplicate Rows
     wiki_movies_df['imdb_id'] = wiki_movies_df['imdb_link'].str.extract(r'(tt\d{7})')
