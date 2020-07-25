@@ -39,6 +39,8 @@ I mentioned step for how to make automated ETL.
 
 
 (1) I created a function that takes in three arguments:
+
+
 Wikipedia data
 
 Kaggle metadata
