@@ -16,23 +16,26 @@ file_dir='C:/Users/viral/Desktop/Class/Movies_ETL/'
 f'{file_dir}filename'
 
 # %%
+#open json file:
 with open(f'{file_dir}/wikipedia.movies.json', mode='r') as file:
     wiki_movies_raw = json.load(file)
 
 # %%
-
+#open kaggle csv:
 kaggle_metadata = pd.read_csv(f'{file_dir}movies_metadata.csv',low_memory=False)
 
 # %%
+#open ratings csv:
 ratings = pd.read_csv(f'{file_dir}ratings.csv')
 
 # %%
+# Create a function that takes in three arguments:
 def automated_ETL(wiki_movies_raw,kaggle_metadata,ratings):
 
-
+    # json files convert into dataframe: 
     wiki_movies_df = pd.DataFrame(wiki_movies_raw)
 
-
+    #create a copy for movies:
     def clean_movie(movie):
         movie = dict(movie) #create a non-destructive copy
         alt_titles = {}
