@@ -32,6 +32,7 @@ ratings = pd.read_csv(f'{file_dir}ratings.csv')
 # Create a function that takes in three arguments:
 def automated_ETL(wiki_movies_raw,kaggle_metadata,ratings):
 
+
     # json files convert into dataframe: 
     wiki_movies_df = pd.DataFrame(wiki_movies_raw)
 
@@ -271,7 +272,19 @@ def automated_ETL(wiki_movies_raw,kaggle_metadata,ratings):
     #load in sql:
     db_string = f"postgres://postgres:{db_password}@127.0.0.1:5432/movie_data"
     engine = create_engine(db_string)
-    movies_df.to_sql(name='movies_Challenge', con=engine)
+    movies_df.to_sql(name='movies_Challenge1', con=engine)
+
+
+    rows_imported = 0
+    # get the start_time from time.time()
+    start_time = time.time()
+    for data in pd.read_csv(f'{file_dir}ratings.csv', chunksize=1000000):
+        print(f'importing rows {rows_imported} to {rows_imported + len(data)}...', end='')
+        data.to_sql(name='ratings_challenge1', con=engine, if_exists='append')
+        rows_imported += len(data)
+
+        # add elapsed time to final print out
+        print(f'Done. {time.time() - start_time} total seconds elapsed')
 
 
 automated_ETL(wiki_movies_raw,kaggle_metadata,ratings)
